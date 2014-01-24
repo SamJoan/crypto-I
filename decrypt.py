@@ -41,6 +41,16 @@ def bytes_pretty(string):
     return ""
 
 def bytes_pretty_three(a, b, c):
+
+    if len(a) > 15:
+        a = a[:15]
+
+    if len(b) > 15:
+        b = b[:15]
+
+    if len(c) > 15:
+        c = c[:15]
+
     print bytes_pretty(a)
     print bytes_pretty(b)
     print "=============================="
@@ -85,61 +95,53 @@ def is_valid(hexa, valid=printable):
     except Exception, e :
         return False
 
-valid = "\x00" + string.ascii_uppercase
+def xored_show(xored):
+    l = []
+    for x in xored:
+        if x in string.printable:
+            l.append(x)
+        elif  x == '\x00':
+            l.append("00")
+        else:
+            l.append("")
+
+    return l
+
 if __name__ == "__main__":
-    enc = encrypted_strings[0]
-    tar = target
+    argv = sys.argv
 
-    xor_both = strxor(enc, tar)
+    # XOR text 1 and text 2
+    if len(argv) == 3:
+        print("2 arg")
+        xored = strxor(encrypted_strings[int(argv[1])], encrypted_strings[int(argv[2])])
+    else :
+        print("1 arg")
+        xored = strxor(target, encrypted_strings[int(argv[1])])
 
-    for x in range(0, len(xor_both), 2):
-        xor_char = xor_both[x:x+2]
-        space = string_to_hex(" ")
-        char = strxor(xor_char, space)
-        bytes_pretty_three(xor_char, space, char)
-        if is_valid(char, valid):
-            print(char, hex_to_string(char))
+    print xored_show(xored)
 
+    guess = "aware "
 
+    x = strxor(xored, guess)
+    x.encode("hex")
+    print hex_to_string(x.encode("hex"))
 
-
+#correct = string.printable + "\x00"
 #if __name__ == "__main__":
-    ## attempt to find " the " inside the string. Redundancy.
-    #redundancy = [
-        #" ",
-    #]
-    #redundancy_hex = [string_to_hex(x) for (x) in redundancy]
+    #valid = True
+    #poss = string_to_hex("I")
 
-    ##encrypted_combinations = itertools.combinations(encrypted_strings, 2)
     #i = 0
-    #results = {}
-    #for enc in encrypted_strings:
-        #words = []
-        #for hexa in redundancy_hex:
-            #e = enc
-            #t = target
-            #l = len(e) / 2 if len(e) > len(t) else len(t) / 2
-            #len_hex = len(hexa)
-            #for x in range(0, int(l), 2):
-                #sub_enc = e[x:x+len_hex]
-                #sub_tar = t[x:x+len_hex]
-
-                #xor_both = strxor(sub_enc, sub_tar)
-
-                ## xor string to a possible known string and see if the other string makes sense
-                #otherword = strxor(hexa, xor_both)
-                #if is_printable_ascii(otherword):
-                    #if x not in results:
-                        #results[x] = []
-                    #results[x].append({"x": x, "hex": otherword, "ascii": hex_to_string(otherword), "i": i})
+    #for e in encrypted_strings:
+        #xored = strxor(target, e)
+        #xor_poss = strxor(poss, xored)
+        #otherchar = hex_to_string(xor_poss)
+        #print(otherchar)
+        #if not otherchar or otherchar not in correct:
+            #print "invalid in %s" % i
+            #valid = False
 
         #i += 1
 
-    #nbs = []
-    #for r in results:
-        #l = results[r]
-        #if len(l) == len(encrypted_strings):
-            #nbs.append(r)
-
-    #print nbs
-
+    #if valid:
+        #print "all valid!"
